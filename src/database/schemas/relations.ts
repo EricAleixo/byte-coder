@@ -5,11 +5,13 @@ import { tags } from './tag.schema';
 import { postTags } from './post-tags.schema';
 import { users } from './user.schema';
 import { comments } from './comments.schema';
+import { postImages } from './post-image.schema';
 
 export const postsRelations = relations(posts, ({ one, many }) => ({
   author: one(users, { fields: [posts.authorId], references: [users.id] }),
   category: one(categories, { fields: [posts.categoryId], references: [categories.id] }),
   postTags: many(postTags),
+  images: many(postImages)
 }));
 
 export const categoriesRelations = relations(categories, ({ many }) => ({
@@ -45,4 +47,11 @@ export const commentsRelations = relations(comments, ({ one, many }) => ({
     relationName: "replies",
   }),
   replies: many(comments, { relationName: "replies" }),
+}));
+
+export const postImagesRelations = relations(postImages, ({ one }) => ({
+  post: one(posts, {
+    fields: [postImages.postId],
+    references: [posts.id],
+  }),
 }));

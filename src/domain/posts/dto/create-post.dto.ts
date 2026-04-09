@@ -48,4 +48,8 @@ export class CreatePostDto {
   @IsArray()
   @IsUUID("4", { each: true })
   tagIds?: string[];
+
+  @IsOptional()
+  @IsArray()
+  contentImages?: { url: string; publicId: string }[];
 }

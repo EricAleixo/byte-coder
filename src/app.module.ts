@@ -6,9 +6,10 @@ import { TagsModule } from './domain/tags/tags.module';
 import { CategoriesModule } from './domain/categories/categories.module';
 import { UploadImageService } from './domain/upload-image/upload-image.service';
 import { CommentsModule } from './domain/comments/comments.module';
+import { PostImagesModule } from './domain/post-images/post-images.module';
 
 @Module({
-  imports: [UsersModule, AuthModule, PostsModule, TagsModule, CategoriesModule, CommentsModule],
+  imports: [UsersModule, AuthModule, PostsModule, TagsModule, CategoriesModule, CommentsModule, PostImagesModule],
   providers: [UploadImageService],
 })
 export class AppModule { }

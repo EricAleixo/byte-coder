@@ -3,21 +3,25 @@ import { PostsRepository } from './posts.repository';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { UploadImageService } from '../upload-image/upload-image.service';
+import { PostImagesService } from '../post-images/post-images.service';
 
 @Injectable()
 export class PostsService {
   constructor(
     private readonly postsRepository: PostsRepository,
-    private readonly uploadImageService: UploadImageService
+    private readonly uploadImageService: UploadImageService,
+    private readonly postImagesService: PostImagesService,
   ) { }
 
-  create(dto: CreatePostDto, authorId: string) {
-    return this.postsRepository.create(dto, authorId);
+  async create(dto: CreatePostDto, authorId: string) {
+    const post = await this.postsRepository.create(dto, authorId);
+    console.log("HTML completo:", dto.content);
+    await this.postImagesService.sync(post.id, dto.content, []);
+    return post;
   }
 
   async uploadImage(file: Express.Multer.File) {
     const uploaded = await this.uploadImageService.upload(file, 'posts');
-
     return {
       imageUrl: uploaded.secure_url,
       publicId: uploaded.public_id,
@@ -56,19 +60,23 @@ export class PostsService {
     const post = await this.findOne(id);
 
     const imageChanged = dto.coverImage && dto.coverImage !== post.coverImage;
-
     if (imageChanged && post.coverImagePublicId) {
       await this.uploadImageService.delete(post.coverImagePublicId);
     }
 
-    return this.postsRepository.update(id, dto);
+    const updated = await this.postsRepository.update(id, dto);
+    await this.postImagesService.sync(id, dto.content ?? post.content, dto.contentImages ?? []);
+    return updated;
   }
 
   async remove(id: string) {
     const post = await this.findOne(id);
+
     if (post.coverImagePublicId) {
       await this.uploadImageService.delete(post.coverImagePublicId);
     }
+
+    await this.postImagesService.deleteAll(id); // limpa conteúdo antes do cascade
     return this.postsRepository.delete(id);
   }
 }
