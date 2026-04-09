@@ -18,6 +18,18 @@ export class PostsRepository {
       .replace(/\s+/g, '-');
   }
 
+  async incrementViews(postId: string) {
+  const [updated] = await db
+    .update(posts)
+    .set({
+      views: sql`${posts.views} + 1`,
+    })
+    .where(eq(posts.id, postId))
+    .returning({ views: posts.views });
+
+  return updated?.views ?? 0;
+}
+
   async create(data: CreatePostDto, authorId: string) {
     const slug = this.generateSlug(data.title);
 

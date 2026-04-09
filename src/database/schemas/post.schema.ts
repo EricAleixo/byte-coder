@@ -4,6 +4,7 @@ import {
     varchar,
     text,
     timestamp,
+    integer,
 } from "drizzle-orm/pg-core";
 
 import { postStatusEnum } from "./enums/post-status";
@@ -19,6 +20,8 @@ export const posts = pgTable("posts", {
     coverImage: text("cover_image"),
     coverImagePublicId: text("cover_image_public_id"),
     readTime: varchar("read_time", { length: 20 }),
+
+    views: integer("views").notNull().default(0),
 
     categoryId: uuid("category_id")
         .notNull()

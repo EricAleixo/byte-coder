@@ -16,7 +16,7 @@ export class PostsService {
   async create(dto: CreatePostDto, authorId: string) {
     const post = await this.postsRepository.create(dto, authorId);
     console.log("HTML completo:", dto.content);
-    await this.postImagesService.sync(post.id, dto.content, []);
+    await this.postImagesService.sync(post.id, dto.content);
     return post;
   }
 
@@ -36,8 +36,23 @@ export class PostsService {
     return this.postsRepository.findById(id);
   }
 
-  findBySlug(slug: string) {
-    return this.postsRepository.findBySlug(slug);
+  private viewsCache = new Map<string, number>();
+
+  async findBySlug(slug: string, ip: string) {
+    const post = await this.postsRepository.findBySlug(slug);
+
+    const key = `${ip}:${post.id}`;
+    const now = Date.now();
+    const ttl = 2 * 60 * 1000;
+
+    const lastView = this.viewsCache.get(key);
+
+    if (!lastView || now - lastView > ttl) {
+      this.viewsCache.set(key, now);
+      this.postsRepository.incrementViews(post.id);
+    }
+
+    return post;
   }
 
   search(query: string) {
@@ -65,7 +80,7 @@ export class PostsService {
     }
 
     const updated = await this.postsRepository.update(id, dto);
-    await this.postImagesService.sync(id, dto.content ?? post.content, dto.contentImages ?? []);
+    await this.postImagesService.sync(id, dto.content ?? post.content);
     return updated;
   }
 
