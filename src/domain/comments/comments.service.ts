@@ -8,12 +8,13 @@ import { CommentsRepository } from "./comments.repository";
 import { CreateCommentDto } from "./dto/create-comment.dto";
 import { UpdateCommentDto } from "./dto/update-comment.dto";
 import { PostsService } from "../posts/posts.service";
+import { PostsRepository } from "../posts/posts.repository";
 
 @Injectable()
 export class CommentsService {
   constructor(
     private readonly commentsRepository: CommentsRepository, 
-    private readonly postsService: PostsService) { }
+    private readonly postsRepository: PostsRepository) { }
 
   async create(dto: CreateCommentDto, userId: string) {
     const isAnonymous = dto.isAnonymous ?? false;
@@ -39,7 +40,7 @@ export class CommentsService {
   }
 
   async findByPost(slug: string) {
-    const post = await this.postsService.findBySlug(slug);
+    const post = await this.postsRepository.findBySlug(slug);
     const comments = await this.commentsRepository.findByPost(post.id);
     return this.mapCommentsTree(comments);
   }

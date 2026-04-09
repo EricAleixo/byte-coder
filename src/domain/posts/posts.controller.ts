@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, Query, UseInterceptors, UploadedFile } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, Query, UseInterceptors, UploadedFile, Req } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
@@ -45,9 +45,15 @@ export class PostsController {
 
   @Get('slug/:slug')
   findBySlug(
-    @Param('slug') slug: string
+    @Param('slug') slug: string,
+    @Req() req: any,
   ) {
-    return this.postsService.findBySlug(slug);
+    const ip =
+      (req.headers['x-forwarded-for'] as string)?.split(',')[0] ||
+      req.socket.remoteAddress ||
+      '';
+
+    return this.postsService.findBySlug(slug, ip);
   }
 
   @Get('search')
