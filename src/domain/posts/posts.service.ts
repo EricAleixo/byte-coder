@@ -12,6 +12,7 @@ export class PostsService {
     private readonly uploadImageService: UploadImageService,
     private readonly postImagesService: PostImagesService,
   ) { }
+  private viewsCache = new Map<string, number>();
 
   async create(dto: CreatePostDto, authorId: string) {
     const post = await this.postsRepository.create(dto, authorId);
@@ -36,7 +37,6 @@ export class PostsService {
     return this.postsRepository.findById(id);
   }
 
-  private viewsCache = new Map<string, number>();
 
   async findBySlug(slug: string, ip: string) {
     const post = await this.postsRepository.findBySlug(slug);
