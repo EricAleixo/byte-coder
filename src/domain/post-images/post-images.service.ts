@@ -9,12 +9,10 @@ export class PostImagesService {
     private readonly uploadService: UploadImageService,
   ) { }
 
-  async sync(postId: string, htmlContent: string, newImages: { url: string; publicId: string }[]) {
+  async sync(postId: string, htmlContent: string) {
     const currentIds = this.extractPublicIds(htmlContent);
-    console.log("currentIds:", currentIds);
 
     const existing = await this.repo.findByPost(postId);
-    console.log("existing:", existing);
 
     const existingIds = existing.map((i) => i.publicId);
     const toInsert = currentIds
@@ -26,13 +24,11 @@ export class PostImagesService {
         return { postId, publicId, url: match?.[1] ?? "" };
       });
 
-    console.log("toInsert:", toInsert);
     if (toInsert.length) {
       await this.repo.insertMany(toInsert);
     }
 
     const orphans = await this.repo.deleteOrphansForPost(postId, currentIds);
-    console.log("orphans deletados:", orphans);
   }
 
   async deleteAll(postId: string) {
