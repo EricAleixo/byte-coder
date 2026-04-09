@@ -10,6 +10,6 @@ import { PostImagesModule } from '../post-images/post-images.module';
   imports: [AuthModule, UploadModule, PostImagesModule],
   controllers: [PostsController],
   providers: [PostsService, PostsRepository],
-  exports: [PostsService],
+  exports: [PostsService, PostsRepository],
 })
 export class PostsModule {}
