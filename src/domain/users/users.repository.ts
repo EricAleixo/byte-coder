@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 import { db } from '../../database';
 import { users } from '../../database/schemas/user.schema';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -22,6 +22,27 @@ export class UserRepository {
     }).returning();
   }
 
+  async findByProviderId(provider: 'google' | 'github', providerId: string) {
+    return db
+      .select()
+      .from(users)
+      .where(and(eq(users.provider, provider), eq(users.providerId, providerId)))
+      .then(r => r[0] ?? null);
+  }
+
+  async createOAuthUser(profile: {
+    email: string;
+    name: string;
+    provider: 'google' | 'github';
+    providerId: string;
+  }) {
+    return db
+      .insert(users)
+      .values({ ...profile, role: 'BASIC' })
+      .returning()
+      .then(r => r[0]);
+  }
+
   async findAll() {
     return await db.query.users.findMany();
   }
@@ -36,14 +57,13 @@ export class UserRepository {
     return user;
   }
 
+  // users.repository.ts
   async findByEmail(email: string) {
-    const user = await db.query.users.findFirst({
-      where: eq(users.email, email),
-    });
-
-    if (!user) throw new NotFoundException('Usuário não encontrado.');
-
-    return user;
+    return db
+      .select()
+      .from(users)
+      .where(eq(users.email, email))
+      .then(r => r[0] ?? null);
   }
 
   async update(id: string, data: UpdateUserDto & { passwordHash?: string }) {

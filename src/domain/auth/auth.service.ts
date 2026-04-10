@@ -26,6 +26,16 @@ export class AuthService {
   async logIn(dto: LogInDto) {
     const user = await this.usersService.findByEmail(dto.email);
 
+    if (!user) {
+      throw new UnauthorizedException('Credenciais inválidas.');
+    }
+
+    if (!user.passwordHash) {
+      throw new UnauthorizedException(
+        `Essa conta foi criada com ${user.provider}. Use o login social.`,
+      );
+    }
+
     const passwordValid = await this.usersService.validatePassword(
       dto.password,
       user.passwordHash,
@@ -33,6 +43,11 @@ export class AuthService {
 
     if (!passwordValid) throw new UnauthorizedException('Credenciais inválidas.');
 
+    const token = this.generateToken(user.id, user.email, user.role);
+    return { user, token };
+  }
+
+  async oAuthLogin(user: { id: string; email: string; role: string }) {
     const token = this.generateToken(user.id, user.email, user.role);
     return { user, token };
   }

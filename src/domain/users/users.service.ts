@@ -20,6 +20,31 @@ export class UsersService {
     return this.userRepository.create({ ...createUserDto, passwordHash });
   }
 
+  async findOrCreateOAuthUser(profile: {
+    email: string;
+    name: string;
+    provider: 'google' | 'github';
+    providerId: string;
+  }) {
+    // Tenta achar pelo providerId primeiro
+    let user = await this.userRepository.findByProviderId(
+      profile.provider,
+      profile.providerId,
+    );
+
+    // Fallback: conta local já existente com mesmo e-mail
+    if (!user) {
+      user = await this.userRepository.findByEmail(profile.email);
+    }
+
+    // Cria se não existir
+    if (!user) {
+      user = await this.userRepository.createOAuthUser(profile);
+    }
+
+    return user;
+  }
+
   findAll() {
     return this.userRepository.findAll();
   }
@@ -54,7 +79,7 @@ export class UsersService {
       passwordHash?: string;
     } = {};
 
-    // 🔹 Nome (só atualiza se vier)
+    // 🔹 Nome
     if (body.name !== undefined) {
       data.name = body.name;
     }
@@ -64,15 +89,19 @@ export class UsersService {
       if (user.avatarPublicId) {
         await this.uploadService.delete(user.avatarPublicId);
       }
-
       const upload = await this.uploadService.upload(file, 'avatars');
-
       data.avatarUrl = upload.url;
       data.avatarPublicId = upload.public_id;
     }
 
-    // 🔹 Senha
+    // 🔹 Senha — bloqueado para usuários OAuth
     if (body.newPassword) {
+      if (!user.passwordHash) {
+        throw new BadRequestException(
+          `Conta criada com ${user.provider}. Não é possível definir uma senha.`,
+        );
+      }
+
       if (!body.currentPassword) {
         throw new BadRequestException('Senha atual obrigatória');
       }
