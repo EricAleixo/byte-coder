@@ -33,6 +33,18 @@ export class UploadImageService {
     });
   }
 
+  // upload-image/upload-image.service.ts
+  async uploadFromUrl(url: string, folder: string) {
+    const result = await cloudinary.uploader.upload(url, {
+      folder,
+    });
+
+    return {
+      url: result.secure_url,
+      public_id: result.public_id,
+    };
+  }
+
   async delete(publicId: string): Promise<void> {
     await cloudinary.uploader.destroy(publicId);
   }

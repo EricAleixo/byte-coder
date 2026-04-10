@@ -35,6 +35,8 @@ export class UserRepository {
     name: string;
     provider: 'google' | 'github';
     providerId: string;
+    avatarUrl?: string;
+    avatarPublicId?: string;
   }) {
     return db
       .insert(users)

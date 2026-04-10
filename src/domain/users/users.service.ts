@@ -25,21 +25,36 @@ export class UsersService {
     name: string;
     provider: 'google' | 'github';
     providerId: string;
+    avatarUrl?: string; // ← URL da foto vinda do provider
   }) {
-    // Tenta achar pelo providerId primeiro
     let user = await this.userRepository.findByProviderId(
       profile.provider,
       profile.providerId,
     );
 
-    // Fallback: conta local já existente com mesmo e-mail
     if (!user) {
       user = await this.userRepository.findByEmail(profile.email);
     }
 
-    // Cria se não existir
     if (!user) {
-      user = await this.userRepository.createOAuthUser(profile);
+      let avatarUrl: string | undefined;
+      let avatarPublicId: string | undefined;
+
+      // Faz upload da foto do provider para o Cloudinary
+      if (profile.avatarUrl) {
+        const upload = await this.uploadService.uploadFromUrl(
+          profile.avatarUrl,
+          'avatars',
+        );
+        avatarUrl = upload.url;
+        avatarPublicId = upload.public_id;
+      }
+
+      user = await this.userRepository.createOAuthUser({
+        ...profile,
+        avatarUrl,
+        avatarPublicId,
+      });
     }
 
     return user;
