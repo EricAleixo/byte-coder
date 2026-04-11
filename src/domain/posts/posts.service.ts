@@ -16,7 +16,6 @@ export class PostsService {
 
   async create(dto: CreatePostDto, authorId: string) {
     const post = await this.postsRepository.create(dto, authorId);
-    console.log("HTML completo:", dto.content);
     await this.postImagesService.sync(post.id, dto.content);
     return post;
   }

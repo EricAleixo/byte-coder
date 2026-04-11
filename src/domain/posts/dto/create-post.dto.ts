@@ -5,6 +5,7 @@ import {
   IsUUID,
   IsArray,
   IsEnum,
+  IsUrl,
 } from "class-validator";
 
 export enum PostStatus {
@@ -52,4 +53,24 @@ export class CreatePostDto {
   @IsOptional()
   @IsArray()
   contentImages?: { url: string; publicId: string }[];
+
+  @IsOptional()
+  @IsArray()
+  links?: PostLinkDto[]
+}
+
+class PostLinkDto {
+  @IsString()
+  label!: string;
+
+  @IsUrl()
+  url!: string;
+
+  @IsOptional()
+  @IsString()
+  type?: "github" | "docs" | "video" | "book" | "other";
+
+  @IsOptional()
+  @IsArray()
+  links?: PostLinkDto[];
 }

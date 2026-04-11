@@ -5,6 +5,7 @@ import {
     text,
     timestamp,
     integer,
+    jsonb,
 } from "drizzle-orm/pg-core";
 
 import { postStatusEnum } from "./enums/post-status";
@@ -28,6 +29,14 @@ export const posts = pgTable("posts", {
         .references(() => categories.id, { onDelete: "restrict" }),
 
     status: postStatusEnum("status").notNull().default("DRAFT"),
+
+    links: jsonb("links").$type<
+        {
+            label: string;
+            url: string;
+            type?: "github" | "docs" | "video" | "book" | "other";
+        }[]
+    >(),
 
     authorId: uuid("author_id")
         .notNull()

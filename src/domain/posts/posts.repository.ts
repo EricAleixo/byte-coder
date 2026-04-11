@@ -53,6 +53,7 @@ export class PostsRepository {
         readTime: data.readTime,
         categoryId: data.categoryId,
         status: data.status ?? "DRAFT",
+        links: data.links,
         authorId,
       })
       .returning();
@@ -309,6 +310,7 @@ export class PostsRepository {
         ...(data.readTime && { readTime: data.readTime }),
         ...(data.categoryId && { categoryId: data.categoryId }),
         ...(data.status && { status: data.status }),
+        ...(data.links && { links: data.links }),
         updatedAt: new Date(),
       })
       .where(eq(posts.id, id));
