@@ -7,9 +7,10 @@ import { CategoriesModule } from './domain/categories/categories.module';
 import { UploadImageService } from './domain/upload-image/upload-image.service';
 import { CommentsModule } from './domain/comments/comments.module';
 import { PostImagesModule } from './domain/post-images/post-images.module';
+import { CoursesModule } from './domain/courses/courses.module';
 
 @Module({
-  imports: [UsersModule, AuthModule, PostsModule, TagsModule, CategoriesModule, CommentsModule, PostImagesModule],
+  imports: [UsersModule, AuthModule, PostsModule, TagsModule, CategoriesModule, CommentsModule, PostImagesModule, CoursesModule],
   providers: [UploadImageService],
 })
 export class AppModule { }

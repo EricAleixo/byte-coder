@@ -78,6 +78,13 @@
       "when": 1775899997480,
       "tag": "0010_natural_ego",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1776096291856,
+      "tag": "0011_cold_alice",
+      "breakpoints": true
     }
   ]
 }
