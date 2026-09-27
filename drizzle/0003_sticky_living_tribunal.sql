@@ -1,0 +1,1 @@
+ALTER TABLE "course_lessons" ALTER COLUMN "video_provider" SET DATA TYPE "public"."course_video_provider";

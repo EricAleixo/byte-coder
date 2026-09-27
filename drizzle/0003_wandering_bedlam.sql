@@ -1,1 +1,0 @@
-ALTER TABLE "posts" ADD COLUMN "cover_image_public_id" text;

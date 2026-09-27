@@ -7,7 +7,16 @@ export * from "./comments.schema";
 export * from "./post-image.schema";
 export * from "./course-post.schema";
 export * from "./course.schema";
+export * from "./course-enrolment.schema";
+export * from "./course-lessons.schema";
+export * from "./course-resources.schema";
+export * from "./course-outcomes.schema";
+export * from "./course-lessons-resources.schema";
+export * from "./course-lesson-progress.schema";
 
 export * from "./enums/post-status";
 export * from "./enums/user-role";
+export * from "./enums/course-level";
+export * from "./enums/course-resource-type";
+export * from "./enums/course-video-provider";
 export * from "./relations";

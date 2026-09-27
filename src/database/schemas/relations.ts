@@ -6,12 +6,20 @@ import { postTags } from './post-tags.schema';
 import { users } from './user.schema';
 import { comments } from './comments.schema';
 import { postImages } from './post-image.schema';
+import { courseResources } from './course-resources.schema';
+import { courses } from './course.schema';
+import { courseOutcomes } from './course-outcomes.schema';
+import { courseLessons } from './course-lessons.schema';
+import { courseLessonResources } from './course-lessons-resources.schema';
 
 export const postsRelations = relations(posts, ({ one, many }) => ({
   author: one(users, { fields: [posts.authorId], references: [users.id] }),
-  category: one(categories, { fields: [posts.categoryId], references: [categories.id] }),
+  category: one(categories, {
+    fields: [posts.categoryId],
+    references: [categories.id],
+  }),
   postTags: many(postTags),
-  images: many(postImages)
+  images: many(postImages),
 }));
 
 export const categoriesRelations = relations(categories, ({ many }) => ({
@@ -31,7 +39,6 @@ export const usersRelations = relations(users, ({ many }) => ({
   posts: many(posts),
 }));
 
-
 export const commentsRelations = relations(comments, ({ one, many }) => ({
   author: one(users, {
     fields: [comments.authorId],
@@ -44,14 +51,56 @@ export const commentsRelations = relations(comments, ({ one, many }) => ({
   parent: one(comments, {
     fields: [comments.parentId],
     references: [comments.id],
-    relationName: "replies",
+    relationName: 'replies',
   }),
-  replies: many(comments, { relationName: "replies" }),
+  replies: many(comments, { relationName: 'replies' }),
 }));
 
 export const postImagesRelations = relations(postImages, ({ one }) => ({
   post: one(posts, {
     fields: [postImages.postId],
     references: [posts.id],
+  }),
+}));
+
+export const coursesRelations = relations(courses, ({ one, many }) => ({
+  author: one(users, {
+    fields: [courses.authorId],
+    references: [users.id],
+  }),
+  lessons: many(courseLessons),
+  resources: many(courseResources),
+  outcomes: many(courseOutcomes),
+}));
+
+export const courseLessonsRelations = relations(courseLessons, ({ one, many }) => ({
+  course: one(courses, {
+    fields: [courseLessons.courseId],
+    references: [courses.id],
+  }),
+  resources: many(courseLessonResources),
+}));
+
+export const courseResourcesRelations = relations(
+  courseResources,
+  ({ one }) => ({
+    course: one(courses, {
+      fields: [courseResources.courseId],
+      references: [courses.id],
+    }),
+  }),
+);
+
+export const courseOutcomesRelations = relations(courseOutcomes, ({ one }) => ({
+  course: one(courses, {
+    fields: [courseOutcomes.courseId],
+    references: [courses.id],
+  }),
+}));
+
+export const courseLessonResourcesRelations = relations(courseLessonResources, ({ one }) => ({
+  lesson: one(courseLessons, {
+    fields: [courseLessonResources.lessonId],
+    references: [courseLessons.id],
   }),
 }));

@@ -1,0 +1,1 @@
+CREATE TYPE "public"."course_video_provider" AS ENUM('YOUTUBE', 'VIMEO', 'DIRECT');

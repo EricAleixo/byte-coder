@@ -8,9 +8,10 @@ import { UploadImageService } from './domain/upload-image/upload-image.service';
 import { CommentsModule } from './domain/comments/comments.module';
 import { PostImagesModule } from './domain/post-images/post-images.module';
 import { CoursesModule } from './domain/courses/courses.module';
+import { EnrollmentModule } from './domain/enrollment/enrollment.module';
 
 @Module({
-  imports: [UsersModule, AuthModule, PostsModule, TagsModule, CategoriesModule, CommentsModule, PostImagesModule, CoursesModule],
+  imports: [UsersModule, AuthModule, PostsModule, TagsModule, CategoriesModule, CommentsModule, PostImagesModule, CoursesModule, EnrollmentModule],
   providers: [UploadImageService],
 })
 export class AppModule { }

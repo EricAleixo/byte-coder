@@ -40,7 +40,6 @@ export class PostImagesService {
 
   private extractPublicIds(html: string): string[] {
     const matches = [...html.matchAll(/data-public-id="([^"]+)"/g)];
-    console.log("IDs extraídos:", matches.map((m) => m[1]));
     return matches.map((m) => m[1]);
   }
 }

@@ -8,6 +8,7 @@ import {
   Body,
   UseGuards,
   Req,
+  Put,
 } from "@nestjs/common";
 import { CoursesService } from "./courses.service";
 import { CreateCourseDto } from "./dto/create-course.dto";
@@ -18,11 +19,15 @@ import { Role } from "../auth/enums/role";
 import { JwtGuard } from "../auth/guards/jwt.guard";
 import { RolesGuard } from "../auth/guards/roles.guard";
 import { UpdatePositionDto } from "./dto/update-position-post.dto";
+import { SaveCourseResourcesDto } from "./dto/create-course-resource.dto";
+import { CreateCourseLessonDto } from "./dto/create-course-lesson.dto";
+import { CreateCourseLessonResourceDto } from "./dto/create-course-lesson-resource.dto";
+import { EnrollmentGuard } from "./guards/enrollment.guard";
 
 
 @Controller("courses")
 export class CoursesController {
-  constructor(private readonly coursesService: CoursesService) {}
+  constructor(private readonly coursesService: CoursesService) { }
 
   // ── Cursos ────────────────────────────────────────────────
 
@@ -39,6 +44,12 @@ export class CoursesController {
   @Get(":slug/posts")
   findWithPosts(@Param("slug") slug: string) {
     return this.coursesService.findWithPosts(slug);
+  }
+
+  @Get(":slug/content")
+  @UseGuards(JwtGuard, EnrollmentGuard)
+  findContent(@Param("slug") slug: string) {
+    return this.coursesService.findContent(slug);
   }
 
   @Post()
@@ -88,6 +99,16 @@ export class CoursesController {
     return this.coursesService.updatePostPosition(courseId, postId, dto);
   }
 
+  @Patch(":courseId/posts/reorder")
+  @UseGuards(JwtGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  reorderPosts(
+    @Param("courseId") courseId: string,
+    @Body() dto: { postIds: string[] },
+  ) {
+    return this.coursesService.reorderPosts(courseId, dto.postIds);
+  }
+
   @Delete(":courseId/posts/:postId")
   @UseGuards(JwtGuard, RolesGuard)
   @Roles(Role.ADMIN)
@@ -96,5 +117,48 @@ export class CoursesController {
     @Param("postId") postId: string
   ) {
     return this.coursesService.removePost(courseId, postId);
+  }
+
+  // ── Lessons (vídeos) do curso ───────────────────────────────
+
+  @Post(":courseId/lessons")
+  @UseGuards(JwtGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  addLesson(
+    @Param("courseId") courseId: string,
+    @Body() dto: CreateCourseLessonDto,
+  ) {
+    return this.coursesService.addLesson(courseId, dto);
+  }
+
+  @Delete(":courseId/lessons/:lessonId")
+  @UseGuards(JwtGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  removeLesson(
+    @Param("courseId") courseId: string,
+    @Param("lessonId") lessonId: string,
+  ) {
+    return this.coursesService.removeLesson(courseId, lessonId);
+  }
+
+  @Post(":courseId/lessons/:lessonId/resources")
+  @UseGuards(JwtGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  addLessonResource(
+    @Param("courseId") courseId: string,
+    @Param("lessonId") lessonId: string,
+    @Body() dto: CreateCourseLessonResourceDto,
+  ) {
+    return this.coursesService.addLessonResource(courseId, lessonId, dto);
+  }
+
+  @Delete(":courseId/lessons/:lessonId/resources/:resourceId")
+  @UseGuards(JwtGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  removeLessonResource(
+    @Param("lessonId") lessonId: string,
+    @Param("resourceId") resourceId: string,
+  ) {
+    return this.coursesService.removeLessonResource(lessonId, resourceId);
   }
 }
